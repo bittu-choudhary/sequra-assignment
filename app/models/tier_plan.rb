@@ -1,0 +1,2 @@
+class TierPlan < ApplicationRecord
+end

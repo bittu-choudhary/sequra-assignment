@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_03_22_135027) do
+ActiveRecord::Schema[7.0].define(version: 2023_03_22_154016) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -62,6 +62,13 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_22_135027) do
     t.datetime "updated_at", null: false
     t.index ["disbursement_id"], name: "index_orders_on_disbursement_id"
     t.index ["merchant_id"], name: "index_orders_on_merchant_id"
+  end
+
+  create_table "tier_plans", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.float "tier_limit", default: 0.0
+    t.float "tier_fee", default: 0.0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   add_foreign_key "disbursements", "merchants"
