@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_03_22_131154) do
+ActiveRecord::Schema[7.0].define(version: 2023_03_22_134033) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -20,6 +20,20 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_22_131154) do
     t.string "code", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "disbursements", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "merchant_id", null: false
+    t.datetime "has_orders_from"
+    t.datetime "has_orders_to"
+    t.float "gross_order_value", default: 0.0, null: false
+    t.float "commission_amount", default: 0.0, null: false
+    t.float "monthly_fee_amount", default: 0.0, null: false
+    t.float "total_amount", default: 0.0, null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["merchant_id"], name: "index_disbursements_on_merchant_id"
   end
 
   create_table "merchants", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -36,5 +50,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_22_131154) do
     t.index ["email"], name: "index_merchants_on_email", unique: true
   end
 
+  add_foreign_key "disbursements", "merchants"
   add_foreign_key "merchants", "currencies"
 end
