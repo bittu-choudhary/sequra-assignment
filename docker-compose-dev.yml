@@ -1,0 +1,38 @@
+version: '3.8'
+services:
+  postgres:
+    environment:
+      # Use following command to access psql
+      # docker run -it --rm --network sequra_assignment_default postgres psql -h postgres -U sequra_assignment_app sequra_assignment_development
+      POSTGRES_USER: sequra_assignment_app
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: sequra_assignment_development
+
+  sequra-assignment:
+    stdin_open: true
+    tty: true
+    volumes:
+      # https://docs.docker.com/docker-for-mac/osxfs-caching/#semantics
+      - .:/sequra-assignment:cached
+    environment:
+      # DATABASE_URL:       postgresql://sequra_assignment_app:password@postgres:5432/sequra_assignment_development
+      RAILS_ENV:          'development'
+      RACK_ENV:           'development'
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
+
+  pg_admin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin4
+    ports:
+      - "12345:80"
+    environment:
+      - GUNICORN_THREADS=1
+      - PGADMIN_DEFAULT_EMAIL=bittu@test.com
+      - PGADMIN_DEFAULT_PASSWORD=password
+    depends_on:
+      - postgres
+      
+volumes:
+  postgres:
+    driver: local
+  pg_admin:

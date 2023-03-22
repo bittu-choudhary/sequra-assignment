@@ -1,0 +1,26 @@
+version: '3.8'
+services:
+  postgres:
+    container_name: ad_postgres
+    image: postgres
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+  sequra-assignment:
+    # Nokogori dependency issue with m1 - https://stackoverflow.com/a/71787531
+    platform: linux/x86_64
+    build: .
+    image: sequra-assignment
+    container_name: sequra-assignment
+    environment:
+      RAILS_ROOT:         /sequra-assignment
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres:
+    driver: local
