@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_03_22_154016) do
+ActiveRecord::Schema[7.0].define(version: 2023_03_22_154206) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -34,6 +34,15 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_22_154016) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["merchant_id"], name: "index_disbursements_on_merchant_id"
+  end
+
+  create_table "merchant_tier_plans", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "merchant_id", null: false
+    t.uuid "tier_plan_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["merchant_id"], name: "index_merchant_tier_plans_on_merchant_id"
+    t.index ["tier_plan_id"], name: "index_merchant_tier_plans_on_tier_plan_id"
   end
 
   create_table "merchants", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -72,6 +81,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_22_154016) do
   end
 
   add_foreign_key "disbursements", "merchants"
+  add_foreign_key "merchant_tier_plans", "merchants"
+  add_foreign_key "merchant_tier_plans", "tier_plans"
   add_foreign_key "merchants", "currencies"
   add_foreign_key "orders", "disbursements"
   add_foreign_key "orders", "merchants"
