@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_03_22_134033) do
+ActiveRecord::Schema[7.0].define(version: 2023_03_22_135027) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -50,6 +50,22 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_22_134033) do
     t.index ["email"], name: "index_merchants_on_email", unique: true
   end
 
+  create_table "orders", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "merchant_id", null: false
+    t.uuid "disbursement_id", null: false
+    t.integer "status", default: 0, null: false
+    t.boolean "is_part_of_disbursement", default: false, null: false
+    t.datetime "disbursed_on"
+    t.datetime "completed_on"
+    t.float "amount", default: 0.0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["disbursement_id"], name: "index_orders_on_disbursement_id"
+    t.index ["merchant_id"], name: "index_orders_on_merchant_id"
+  end
+
   add_foreign_key "disbursements", "merchants"
   add_foreign_key "merchants", "currencies"
+  add_foreign_key "orders", "disbursements"
+  add_foreign_key "orders", "merchants"
 end
