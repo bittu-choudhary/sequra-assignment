@@ -20,5 +20,13 @@ class Merchant < ApplicationRecord
   scope :got_live_on_weekday, -> (weekday) { where(live_on_weekday: weekday) }
   scope :live_on_after, -> (day) { where("live_on > ?", day) }
   scope :live_on_or_before, -> (day) { where("live_on <= ?", day) }
-  
+
+  def monthly_fee_penalty(amount)
+    if minimum_monthly_fee > amount
+      return  (minimum_monthly_fee - amount)
+    else
+      0.0
+    end
+  end
+
 end
