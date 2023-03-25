@@ -23,6 +23,23 @@ services:
       - postgres
       - redis
 
+  job:
+    container_name: sequra_job
+    image: sequra-assignment
+    command: sidekiq
+    volumes:
+      - .:/sequra-assignment
+    environment:
+      RAILS_ROOT:         /sequra-assignment
+      REDIS_URL:          redis://redis:6379
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: 1m
+    depends_on:
+      - postgres
+      - redis
+
   redis:
     container_name: sequra_redis
     image: redis:alpine
