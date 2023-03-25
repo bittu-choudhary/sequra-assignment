@@ -50,3 +50,21 @@ plans.each do |plan|
 end
 
 puts "Tier plan seed complete"
+
+puts "Seeding Merchants"
+
+currency = Currency.find_by(code: "EUR")
+
+CSV.read(Rails.root.join('lib', 'seeds', 'merchants.csv'), headers: true).each do |row|
+    data = row.to_hash
+    data["disbursement_frequency"].downcase!
+    merchant = Merchant.new(data)
+    merchant.currency = currency
+    merchant.live_on_weekday = merchant.live_on.strftime('%w').to_i
+    unless merchant.save
+        puts "Merchant not created: #{row.to_hash}"
+        p merchant.errors.full_messages
+    end
+end
+
+puts "Merchant seed complete"
