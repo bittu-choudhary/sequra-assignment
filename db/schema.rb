@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_03_22_154206) do
+ActiveRecord::Schema[7.0].define(version: 2023_03_23_131051) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -33,6 +33,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_22_154206) do
     t.integer "status", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "calculated_for"
     t.index ["merchant_id"], name: "index_disbursements_on_merchant_id"
   end
 
@@ -61,20 +62,19 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_22_154206) do
 
   create_table "orders", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "merchant_id", null: false
-    t.uuid "disbursement_id", null: false
+    t.uuid "disbursement_id"
     t.integer "status", default: 0, null: false
-    t.boolean "is_part_of_disbursement", default: false, null: false
     t.datetime "disbursed_on"
     t.datetime "completed_on"
     t.float "amount", default: 0.0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["disbursement_id"], name: "index_orders_on_disbursement_id"
+    t.float "commission_amount"
     t.index ["merchant_id"], name: "index_orders_on_merchant_id"
   end
 
   create_table "tier_plans", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.float "tier_limit", default: 0.0
+    t.float "tier_limit"
     t.float "tier_fee", default: 0.0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -84,6 +84,5 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_22_154206) do
   add_foreign_key "merchant_tier_plans", "merchants"
   add_foreign_key "merchant_tier_plans", "tier_plans"
   add_foreign_key "merchants", "currencies"
-  add_foreign_key "orders", "disbursements"
   add_foreign_key "orders", "merchants"
 end
