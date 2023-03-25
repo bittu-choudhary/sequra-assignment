@@ -9,6 +9,9 @@ class Order < ApplicationRecord
 
   enum :status, { pending: 0, completed: 1 }, prefix: true
 
+  scope :completed, -> { where(status: 1) }
+  scope :pending, -> { where(status: 0) }
+
   after_create :calculate_commission
 
   def calculate_commission
