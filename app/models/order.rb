@@ -12,6 +12,7 @@ class Order < ApplicationRecord
   scope :completed, -> { where(status: 1) }
   scope :pending, -> { where(status: 0) }
   scope :pending_disbursement_calculation, -> { where(disbursement_id: nil) }
+  scope :received_by, -> (merchants) { where(merchant: merchants) }
 
   after_create :calculate_commission
 
