@@ -78,3 +78,37 @@ Merchant.find_each.each do |merchant|
 end
 
 puts "Merchant tier plan seed complete"
+
+puts "Seeding Orders"
+group_by_merchant = {}
+merchants = {}
+
+puts "Reading orders data from import file"
+
+orders_data = CSV.read(Rails.root.join('lib', 'seeds', 'orders.csv'), headers: true)
+
+puts "Finished reading orders data from import file"
+
+no_of_orders = orders_data.length
+orders_imported = 0
+
+puts "Starting processing orders"
+
+orders_data.each do |row|
+    data = row.to_hash
+    
+    merchants[data["merchant_reference"]] ||= Merchant.find_by(name: data["merchant_reference"])
+    data["merchant_id"] = merchants[data["merchant_reference"]].id
+    data["commission_amount"] = merchants[data["merchant_reference"]].commission_amount(data["amount"].to_f).round(2)
+
+    group_by_merchant[data["merchant_reference"]] ||= []
+    group_by_merchant[data["merchant_reference"]] << data.except("merchant_reference")
+
+    orders_imported += 1 
+    puts "#{orders_imported}/#{no_of_orders} imported" if orders_imported%1000 == 0
+end
+group_by_merchant.each do |name, data|
+    Order.insert_all(data)
+end
+
+puts "Order seed complete"
