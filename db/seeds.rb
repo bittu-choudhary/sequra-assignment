@@ -22,3 +22,31 @@ currencies.each do |data|
         p currency.errors.full_messages
     end
 end
+
+puts "Currency seed complete"
+
+puts "Seeding Tier plans"
+
+plans = [
+    {
+        tier_limit: 50.0,
+        tier_fee: 0.01
+    },
+    {
+        tier_limit: 300.0,
+        tier_fee: 0.0095
+    },
+    {
+        tier_fee: 0.0085
+    }
+]
+
+plans.each do |plan|
+    tier = TierPlan.new(plan)
+    unless tier.save
+        puts "Tier plan not created: #{plan}"
+        p plan.errors.full_messages
+    end
+end
+
+puts "Tier plan seed complete"
