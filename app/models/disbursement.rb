@@ -11,5 +11,10 @@ class Disbursement < ApplicationRecord
 
   enum :status, { in_progress: 0, ready: 1, completed: 2 }, prefix: true
   scope :calculated_for_between, -> (from, to) { where("calculated_for >= ? AND calculated_for <= ?", from, to ) }
-  
+
+  before_save :set_total_amount
+
+  def set_total_amount
+    self.total_amount = self.gross_order_value - self.commission_amount
+  end
 end
