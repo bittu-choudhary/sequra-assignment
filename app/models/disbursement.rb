@@ -10,5 +10,6 @@ class Disbursement < ApplicationRecord
   validates :status, presence: true
 
   enum :status, { in_progress: 0, ready: 1, completed: 2 }, prefix: true
+  scope :calculated_for_between, -> (from, to) { where("calculated_for >= ? AND calculated_for <= ?", from, to ) }
   
 end
