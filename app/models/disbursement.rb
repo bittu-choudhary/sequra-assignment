@@ -36,6 +36,7 @@ class Disbursement < ApplicationRecord
         disbursement.gross_order_value += qualified_orders.sum(:amount).round(2)
         disbursement.commission_amount += qualified_orders.sum(:commission_amount).round(2)
       end
+      disbursement.monthly_fee_amount = disbursement.calculate_prev_month_fee_penalty.round(2) if disbursement.eligible_for_monthly_fee_penalty?
 
       if disbursement.save
         disbursement.update(status: 1) if qualified_orders.update_all(disbursement_id: disbursement.id)
