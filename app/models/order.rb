@@ -9,4 +9,10 @@ class Order < ApplicationRecord
 
   enum :status, { pending: 0, completed: 1 }, prefix: true
 
+  after_create :calculate_commission
+
+  def calculate_commission
+    self.commission_amount = merchant.commission_amount(amount).round(2)
+  end
+
 end
