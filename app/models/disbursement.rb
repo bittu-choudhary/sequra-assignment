@@ -43,6 +43,10 @@ class Disbursement < ApplicationRecord
     end
   end
 
+  def is_first_of_the_month?
+    merchant.disbursements.calculated_for_between(calculated_for.beginning_of_month, calculated_for.end_of_month).empty?
+  end
+
   def set_total_amount
     self.total_amount = self.gross_order_value - self.commission_amount
   end
