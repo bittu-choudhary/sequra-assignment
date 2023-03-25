@@ -25,7 +25,10 @@ class Disbursement < ApplicationRecord
     def calculate_for_merchant(merchant = nil, day = Date.today)
       return unless merchant.is_a?(Merchant)
       disbursement = Disbursement.where(merchant: merchant, calculated_for: day, status: [0, 1]).first_or_initialize
+
+      # Mark disbursements in_progress so that disbursement processing service can't process disbursements
       disbursement.update(status: 0) if disbursement.status_ready?
+      
       from = merchant.daily_disbursement_frequency? ? day.beginning_of_day : (day - 7.day).beginning_of_day
       to = day.end_of_day
       qualified_orders = Order.pending_disbursement_calculation.received_by(merchant).created_between(from, to)
@@ -45,7 +48,10 @@ class Disbursement < ApplicationRecord
   end
 
   def eligible_for_monthly_fee_penalty?
+    # should be first disbursement of the month
     return false unless is_first_of_the_month?
+
+    # Merchant shouldn't be in it's first month of being live
     return false if merchant.live_on.beginning_of_month >= calculated_for.beginning_of_month
     true
   end
