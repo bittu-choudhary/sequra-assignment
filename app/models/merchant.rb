@@ -18,5 +18,7 @@ class Merchant < ApplicationRecord
   scope :with_daily_disbursement, -> { where(disbursement_frequency: "daily") }
   scope :with_weekly_disbursement, -> { where(disbursement_frequency: "weekly") }
   scope :got_live_on_weekday, -> (weekday) { where(live_on_weekday: weekday) }
-
+  scope :live_on_after, -> (day) { where("live_on > ?", day) }
+  scope :live_on_or_before, -> (day) { where("live_on <= ?", day) }
+  
 end
