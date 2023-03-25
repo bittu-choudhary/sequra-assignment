@@ -43,6 +43,12 @@ class Disbursement < ApplicationRecord
     end
   end
 
+  def eligible_for_monthly_fee_penalty?
+    return false unless is_first_of_the_month?
+    return false if merchant.live_on.beginning_of_month >= calculated_for.beginning_of_month
+    true
+  end
+
   def is_first_of_the_month?
     merchant.disbursements.calculated_for_between(calculated_for.beginning_of_month, calculated_for.end_of_month).empty?
   end
