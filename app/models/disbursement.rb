@@ -65,7 +65,7 @@ class Disbursement < ApplicationRecord
   def calculate_monthly_fee_penalty(beginning_of_month, end_of_month)
     disbursements = merchant.disbursements.calculated_for_between(beginning_of_month, end_of_month)
     return merchant.minimum_monthly_fee if disbursements.empty?
-    merchant.monthly_fee_(disbursements.sum(:commission_amount))
+    merchant.monthly_fee_penalty(disbursements.sum(:commission_amount))
   end
 
   def is_first_of_the_month?
