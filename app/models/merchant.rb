@@ -29,4 +29,18 @@ class Merchant < ApplicationRecord
     end
   end
 
+  def commission_amount(amount)
+    (amount*commission(amount))
+  end
+
+  def commission(amount)
+    merchant_subscriptions = merchant_tier_plans.includes(:tier_plan)
+    merchant_subscriptions.where.not(tier_plan: { tier_limit: nil }).order("tier_plan.tier_limit").each do |plan|
+      return plan.tier_plan.tier_fee if amount < plan.tier_plan.tier_limit
+    end
+
+    max_limit_plan = merchant_subscriptions.find_by(tier_plan: { tier_limit: nil })
+    return max_limit_plan.tier_plan.tier_fee
+  end
+
 end
