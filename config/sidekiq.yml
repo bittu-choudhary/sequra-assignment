@@ -1,0 +1,5 @@
+:scheduler:
+  :schedule:
+    DisbursementCalculatorJob:
+      cron: '0 59 3-20/3 * * *'   # Runs At second :00, at minute :59, every 3 hours between hours 03am and 20pm, of every day
+      class: DisbursementCalculatorJob
