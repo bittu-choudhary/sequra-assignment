@@ -6,8 +6,9 @@
 #   movies = Movie.create([{ name: "Star Wars" }, { name: "Lord of the Rings" }])
 #   Character.create(name: "Luke", movie: movies.first)
 require 'csv'
+logger = Logger.new(STDOUT)
 
-puts "Seeding currency"
+logger.info "Seeding currency"
 
 currencies = [
     {
@@ -18,14 +19,14 @@ currencies = [
 currencies.each do |data|
     currency = Currency.new(data)
     unless currency.save
-        puts "Currency not created: #{data}"
-        p currency.errors.full_messages
+        logger.info "Currency not created: #{data}"
+        logger.error currency.errors.full_messages
     end
 end
 
-puts "Currency seed complete"
+logger.info "Currency seed complete"
 
-puts "Seeding Tier plans"
+logger.info "Seeding Tier plans"
 
 plans = [
     {
@@ -44,14 +45,14 @@ plans = [
 plans.each do |plan|
     tier = TierPlan.new(plan)
     unless tier.save
-        puts "Tier plan not created: #{plan}"
+        logger.info "Tier plan not created: #{plan}"
         p plan.errors.full_messages
     end
 end
 
-puts "Tier plan seed complete"
+logger.info "Tier plan seed complete"
 
-puts "Seeding Merchants"
+logger.info "Seeding Merchants"
 
 currency = Currency.find_by(code: "EUR")
 
@@ -62,14 +63,14 @@ CSV.read(Rails.root.join('lib', 'seeds', 'merchants.csv'), headers: true).each d
     merchant.currency = currency
     merchant.live_on_weekday = merchant.live_on.strftime('%w').to_i
     unless merchant.save
-        puts "Merchant not created: #{row.to_hash}"
+        logger.info "Merchant not created: #{row.to_hash}"
         p merchant.errors.full_messages
     end
 end
 
-puts "Merchant seed complete"
+logger.info "Merchant seed complete"
 
-puts "Seeding Merchant tier plan"
+logger.info "Seeding Merchant tier plan"
 
 Merchant.find_each.each do |merchant|
     TierPlan.find_each.each do |plan|
@@ -77,22 +78,22 @@ Merchant.find_each.each do |merchant|
     end
 end
 
-puts "Merchant tier plan seed complete"
+logger.info "Merchant tier plan seed complete"
 
-puts "Seeding Orders"
+logger.info "Seeding Orders"
 group_by_merchant = {}
 merchants = {}
 
-puts "Reading orders data from import file"
+logger.info "Reading orders data from import file"
 
 orders_data = CSV.read(Rails.root.join('lib', 'seeds', 'orders.csv'), headers: true)
 
-puts "Finished reading orders data from import file"
+logger.info "Finished reading orders data from import file"
 
 no_of_orders = orders_data.length
 orders_imported = 0
 
-puts "Starting processing orders"
+logger.info "Starting processing orders"
 
 orders_data.each do |row|
     data = row.to_hash
@@ -105,10 +106,10 @@ orders_data.each do |row|
     group_by_merchant[data["merchant_reference"]] << data.except("merchant_reference")
 
     orders_imported += 1 
-    puts "#{orders_imported}/#{no_of_orders} imported" if orders_imported%1000 == 0
+    logger.info "#{orders_imported}/#{no_of_orders} orders imported" if orders_imported%1000 == 0
 end
 group_by_merchant.each do |name, data|
     Order.insert_all(data)
 end
 
-puts "Order seed complete"
+logger.info "Order seed complete"
