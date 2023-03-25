@@ -14,6 +14,16 @@ class Disbursement < ApplicationRecord
 
   before_save :set_total_amount
 
+  class << self
+
+    def calculate(merchants = Merchant.all, day = Date.today)
+      merchants.each do |merchant|
+        calculate_for_merchant(merchant, day)
+      end
+    end
+    
+  end
+
   def set_total_amount
     self.total_amount = self.gross_order_value - self.commission_amount
   end
