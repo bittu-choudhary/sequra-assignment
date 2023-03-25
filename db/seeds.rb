@@ -68,3 +68,13 @@ CSV.read(Rails.root.join('lib', 'seeds', 'merchants.csv'), headers: true).each d
 end
 
 puts "Merchant seed complete"
+
+puts "Seeding Merchant tier plan"
+
+Merchant.find_each.each do |merchant|
+    TierPlan.find_each.each do |plan|
+        MerchantTierPlan.create(merchant: merchant, tier_plan: plan)
+    end
+end
+
+puts "Merchant tier plan seed complete"
