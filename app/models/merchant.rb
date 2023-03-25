@@ -15,4 +15,7 @@ class Merchant < ApplicationRecord
   enum :live_on_weekday, { sunday: 0, monday: 1, tuesday: 2, wednesday: 3, thursday: 4, friday: 5, saturday: 6 }, prefix: true
   enum :disbursement_frequency, { daily: 0, weekly: 1 }, suffix: true
 
+  scope :with_daily_disbursement, -> { where(disbursement_frequency: "daily") }
+  scope :with_weekly_disbursement, -> { where(disbursement_frequency: "weekly") }
+
 end
