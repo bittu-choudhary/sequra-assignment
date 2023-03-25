@@ -21,7 +21,26 @@ class Disbursement < ApplicationRecord
         calculate_for_merchant(merchant, day)
       end
     end
-    
+
+    def calculate_for_merchant(merchant = nil, day = Date.today)
+      return unless merchant.is_a?(Merchant)
+      disbursement = Disbursement.where(merchant: merchant, calculated_for: day, status: [0, 1]).first_or_initialize
+      disbursement.update(status: 0) if disbursement.status_ready?
+      from = merchant.daily_disbursement_frequency? ? day.beginning_of_day : (day - 7.day).beginning_of_day
+      to = day.end_of_day
+      qualified_orders = Order.pending_disbursement_calculation.received_by(merchant).created_between(from, to)
+
+      unless qualified_orders.empty?
+        disbursement.has_orders_from = qualified_orders.first.created_at
+        disbursement.has_orders_to = qualified_orders.last.created_at
+        disbursement.gross_order_value += qualified_orders.sum(:amount).round(2)
+        disbursement.commission_amount += qualified_orders.sum(:commission_amount).round(2)
+      end
+
+      if disbursement.save
+        disbursement.update(status: 1) if qualified_orders.update_all(disbursement_id: disbursement.id)
+      end
+    end
   end
 
   def set_total_amount
