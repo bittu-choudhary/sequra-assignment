@@ -13,6 +13,7 @@ class Order < ApplicationRecord
   scope :pending, -> { where(status: 0) }
   scope :pending_disbursement_calculation, -> { where(disbursement_id: nil) }
   scope :received_by, -> (merchants) { where(merchant: merchants) }
+  scope :created_between, -> (from, to) { where("created_at >= ? AND created_at <= ?", from, to) }
 
   after_create :calculate_commission
 
