@@ -79,4 +79,21 @@ RSpec.describe Merchant, type: :model do
     end
   end
 
+  describe "instance method monthly_fee_penalty - should return applicable monthly_fee_penalty based on sum of prev months commission amount" do
+    let!(:merchant) { create(:merchant) }
+
+    it "should return 0.0 as there is no minimum monthly fee merchant" do
+      expect(merchant.monthly_fee_penalty(20)).to eq(10.0)
+    end
+    
+    let!(:merchant) { create(:merchant, :with_monthly_fee) }
+    it "should return 10" do
+      expect(merchant.monthly_fee_penalty(20)).to eq(10)
+    end
+
+    it "should return 0.0 as commission is above minimum monthly fee" do
+      expect(merchant.monthly_fee_penalty(320)).to eq(0.0)
+    end
+  end
+
 end
