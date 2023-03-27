@@ -3,7 +3,6 @@ class Order < ApplicationRecord
   belongs_to :disbursement, optional: true
 
   validates :merchant, presence: true
-  validates :disbursement, presence: true
   validates :status, presence: true
   validates :amount, presence: true
 
