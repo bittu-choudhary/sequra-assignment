@@ -47,4 +47,20 @@ RSpec.describe Merchant, type: :model do
     end
   end
 
+  describe "instance method commission - should return applicable tier fee" do
+    let!(:merchant) { create(:merchant) }
+
+    it "should return 0.01" do
+      expect(merchant.commission(20)).to eq(0.01)
+    end
+
+    it "should return 0.0095" do
+      expect(merchant.commission(70)).to eq(0.0095)
+    end
+
+    it "should return 0.0085" do
+      expect(merchant.commission(320)).to eq(0.0085)
+    end
+  end
+
 end
