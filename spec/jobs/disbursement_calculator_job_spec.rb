@@ -1,5 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe DisbursementCalculatorJob, type: :job do
-  pending "add some examples to (or delete) #{__FILE__}"
+  it "should enqueue a job" do
+    ActiveJob::Base.queue_adapter = :test
+    expect do
+      DisbursementCalculatorJob.perform_later
+    end.to have_enqueued_job
+  end
 end
