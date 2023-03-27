@@ -23,6 +23,16 @@ RSpec.describe Disbursement, type: :model do
     end
   end
 
+  describe "instance method eligible_for_monthly_fee_penalty - check if disbursement should charge penalty" do
+    let!(:merchant) { create(:merchant, live_on: Date.today - 1.month) }
+    let!(:disbursement) { build(:disbursement, merchant: merchant, calculated_for: Date.today) }
+
+    it "should return true" do
+      expect(disbursement.eligible_for_monthly_fee_penalty?).to eq(true)
+    end
+
+  end
+
   describe "instance method calculate_prev_month_fee_penalty - return penalty for prev month" do
     let!(:merchant) { create(:merchant,:with_monthly_fee, live_on: Date.today - 1.month) }
     let!(:disbursement) { build(:disbursement, merchant: merchant) }
