@@ -21,6 +21,19 @@ RSpec.describe Disbursement, type: :model do
     it 'should return disbursements calculated for between specific dates' do
       expect(Disbursement.calculated_for_between(Date.today - 10.day, Date.today)).to include(disb_calculated_for_between)
     end
+  end
+
+  describe "instance method is_first_of_the_month? - returns true if disbursement is first of the month" do
+    let!(:disbursement) { build(:disbursement, calculated_for: Date.today) }
+
+    it "should return true" do
+      expect(disbursement.is_first_of_the_month?).to eq(true)
+    end
+
+    it "should return false" do
+      disbursement.save
+      expect(disbursement.is_first_of_the_month?).to eq(false)
+    end
   end 
 
   describe "instance method set_total_amount - returns final amount to be paid" do
