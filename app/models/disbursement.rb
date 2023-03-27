@@ -17,7 +17,7 @@ class Disbursement < ApplicationRecord
   class << self
 
     def calculate(merchants = Merchant.all, day = Date.today)
-      merchants.each do |merchant|
+      merchants.map do |merchant|
         calculate_for_merchant(merchant, day)
       end
     end
@@ -32,17 +32,23 @@ class Disbursement < ApplicationRecord
       from = merchant.daily_disbursement_frequency? ? day.beginning_of_day : (day - 7.day).beginning_of_day
       to = day.end_of_day
       qualified_orders = Order.pending_disbursement_calculation.received_by(merchant).created_between(from, to)
-
+      
       unless qualified_orders.empty?
         disbursement.has_orders_from = qualified_orders.first.created_at
         disbursement.has_orders_to = qualified_orders.last.created_at
         disbursement.gross_order_value += qualified_orders.sum(:amount).round(2)
         disbursement.commission_amount += qualified_orders.sum(:commission_amount).round(2)
       end
+
       disbursement.monthly_fee_amount = disbursement.calculate_prev_month_fee_penalty.round(2) if disbursement.eligible_for_monthly_fee_penalty?
 
       if disbursement.save
         disbursement.update(status: 1) if qualified_orders.update_all(disbursement_id: disbursement.id)
+        return disbursement
+      else
+        logger = Logger.new(STDOUT)
+        logger.error disbursement.errors
+        nil
       end
     end
   end
