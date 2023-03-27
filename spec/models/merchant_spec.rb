@@ -63,4 +63,20 @@ RSpec.describe Merchant, type: :model do
     end
   end
 
+  describe "instance method commission_amount - should return applicable net commission per order amount" do
+    let!(:merchant) { create(:merchant) }
+
+    it "should return 0.01*20" do
+      expect(merchant.commission_amount(20)).to eq(0.01*20)
+    end
+
+    it "should return 0.0095*70" do
+      expect(merchant.commission_amount(70)).to eq(0.0095*70)
+    end
+
+    it "should return 0.0085*320" do
+      expect(merchant.commission_amount(320)).to eq(0.0085*320)
+    end
+  end
+
 end
