@@ -23,6 +23,15 @@ RSpec.describe Disbursement, type: :model do
     end
   end
 
+  describe "instance method calculate_prev_month_fee_penalty - return penalty for prev month" do
+    let!(:merchant) { create(:merchant,:with_monthly_fee, live_on: Date.today - 1.month) }
+    let!(:disbursement) { build(:disbursement, merchant: merchant) }
+
+    it "should return prev month fee penalty" do
+      expect(disbursement.calculate_prev_month_fee_penalty).to eq(merchant.minimum_monthly_fee)
+    end
+  end
+
   describe "instance method is_first_of_the_month? - returns true if disbursement is first of the month" do
     let!(:disbursement) { build(:disbursement, calculated_for: Date.today) }
 
