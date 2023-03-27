@@ -23,6 +23,27 @@ RSpec.describe Disbursement, type: :model do
     end
   end
 
+  describe "class method calculate_for_merchant - Calculates disbursements for given merchant for given day" do
+    let!(:merchant) { create(:merchant, :with_monthly_fee, live_on: Date.today - 1.month) }
+    let!(:orders) { create_list(:order, 3, merchant: merchant, created_at: Date.today, amount: 30) }
+    let!(:disbursement) { Disbursement.calculate_for_merchant(merchant, Date.today) }
+    
+    it "should return correct gross_order_value" do
+      # disbursement = Disbursement.calculate_for_merchant(merchant, Date.today)
+      gross_order_value = orders.inject(0){|sum, order| sum += order.amount }.round(2)      
+      expect(disbursement.gross_order_value).to eq(gross_order_value)
+    end
+
+    it "should return correct commission_amount" do
+      commission_amount = orders.inject(0){|sum, order| sum += order.commission_amount }.round(2)      
+      expect(disbursement.commission_amount).to eq(commission_amount)
+    end
+
+    it "should return correct monthly_fee_amount" do
+      expect(disbursement.monthly_fee_amount).to eq(merchant.minimum_monthly_fee)
+    end
+  end
+
   describe "instance method calculate_monthly_fee_penalty - returns penalty between given dates" do
     let!(:merchant) { create(:merchant,:with_monthly_fee, live_on: Date.today - 10.month) }
     let!(:disbursement) { build(:disbursement, merchant: merchant, calculated_for: Date.today) }
