@@ -21,6 +21,19 @@ RSpec.describe Disbursement, type: :model do
     it 'should return disbursements calculated for between specific dates' do
       expect(Disbursement.calculated_for_between(Date.today - 10.day, Date.today)).to include(disb_calculated_for_between)
     end
+  end 
+
+  describe "instance method set_total_amount - returns final amount to be paid" do
+    let!(:merchant) { create(:merchant) }
+    let!(:orders) { create_list(:order, 3, merchant: merchant) }
+    let!(:disbursement) { create(:disbursement, merchant: merchant, orders: orders) }
+
+    it "should return correct total amount" do
+      gross_order_value = orders.inject(0){|sum, order| sum += order.amount }.round(2)
+      total_commission = orders.inject(0){|sum, order| sum += order.commission_amount }.round(2)
+      
+      expect(disbursement.total_amount).to eq(gross_order_value - total_commission)
+    end
   end
 
 end
