@@ -42,4 +42,25 @@ RSpec.describe Order, type: :model do
     end
 
   end
+
+  describe "calculate commission" do
+    let!(:merchant) { create(:merchant) }
+    let!(:order) { create(:order, amount: 20) }
+    commission = 20*0.01
+    it 'should calculate correct commission for basic tier' do
+      expect(order.calculate_commission).to eq(commission)
+    end
+
+    let!(:order) { create(:order, amount: 80) }
+    commission = 80*0.0095
+    it 'should calculate correct commission for medium tier' do
+      expect(order.calculate_commission).to eq(commission)
+    end
+
+    let!(:order) { create(:order, amount: 320) }
+    commission = 320*0.0085
+    it 'should calculate correct commission for premium tier' do
+      expect(order.calculate_commission).to eq(commission)
+    end
+  end
 end
